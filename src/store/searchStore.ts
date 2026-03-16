@@ -1,8 +1,34 @@
 import { create } from 'zustand'
 import type { FreesoundTrack } from '../types'
 import { searchBGM } from '../audio/freesound'
+import { getPresetAsFreesoundTracks } from '../data/presets'
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
+
+const STORAGE_KEY = 'scenebgm-track-tags'
+
+function saveTagsToStorage(results: FreesoundTrack[]) {
+  const data: Record<string, { scenes: string[]; pinned: boolean; pinnedToPlaylistId: string | null }> = {}
+  results.forEach(t => {
+    if (t.scenes.size > 0 || t.pinned) {
+      data[String(t.id)] = {
+        scenes: Array.from(t.scenes),
+        pinned: t.pinned,
+        pinnedToPlaylistId: t.pinnedToPlaylistId,
+      }
+    }
+  })
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+}
+
+function loadTagsFromStorage(): Record<string, { scenes: string[]; pinned: boolean; pinnedToPlaylistId: string | null }> {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    return raw ? JSON.parse(raw) : {}
+  } catch {
+    return {}
+  }
+}
 
 interface SearchState {
   results: FreesoundTrack[]
@@ -46,7 +72,7 @@ function debouncedFetch(get: () => SearchState) {
 }
 
 export const useSearchStore = create<SearchState>((set, get) => ({
-  results: [],
+  results: getPresetAsFreesoundTracks(),
   loading: false,
   error: null,
 
@@ -93,7 +119,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       freeWord,
     ].filter(Boolean)
 
-    if (!parts.length) { set({ results: [], loading: false }); return }
+    if (!parts.length) { set({ results: getPresetAsFreesoundTracks(), loading: false }); return }
 
     set({ loading: true, error: null })
     try {
@@ -109,32 +135,51 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       })
       const prev = get().results
       const prevMap = new Map(prev.map(t => [t.id, t]))
-      const merged: FreesoundTrack[] = filtered.map(r => ({
-        ...r,
-        scenes: prevMap.get(r.id)?.scenes ?? new Set(),
-        pinned: prevMap.get(r.id)?.pinned ?? false,
-        pinnedToPlaylistId: prevMap.get(r.id)?.pinnedToPlaylistId ?? null,
-      }))
+      const savedTags = loadTagsFromStorage()
+      const merged: FreesoundTrack[] = filtered.map(r => {
+        const saved = savedTags[String(r.id)]
+        const prev = prevMap.get(r.id)
+        return {
+          ...r,
+          scenes: saved
+            ? new Set(saved.scenes)
+            : prev?.scenes ?? new Set(),
+          pinned: saved
+            ? saved.pinned
+            : prev?.pinned ?? false,
+          pinnedToPlaylistId: saved
+            ? saved.pinnedToPlaylistId
+            : prev?.pinnedToPlaylistId ?? null,
+        }
+      })
       set({ results: merged, loading: false })
     } catch (e: unknown) {
       set({ error: e instanceof Error ? e.message : String(e), loading: false })
     }
   },
 
-  toggleScene: (trackId, sceneId) => set(s => ({
-    results: s.results.map(t => {
-      if (t.id !== trackId) return t
-      const next = new Set(t.scenes)
-      next.has(sceneId) ? next.delete(sceneId) : next.add(sceneId)
-      return { ...t, scenes: next }
+  toggleScene: (trackId, sceneId) => {
+    set(s => {
+      const results = s.results.map(t => {
+        if (t.id !== trackId) return t
+        const next = new Set(t.scenes)
+        next.has(sceneId) ? next.delete(sceneId) : next.add(sceneId)
+        return { ...t, scenes: next }
+      })
+      saveTagsToStorage(results)
+      return { results }
     })
-  })),
+  },
 
-  togglePin: (trackId, playlistId) => set(s => ({
-    results: s.results.map(t => {
-      if (t.id !== trackId) return t
-      const pinned = t.pinned && t.pinnedToPlaylistId === playlistId ? false : true
-      return { ...t, pinned, pinnedToPlaylistId: pinned ? playlistId : null }
+  togglePin: (trackId, playlistId) => {
+    set(s => {
+      const results = s.results.map(t => {
+        if (t.id !== trackId) return t
+        const pinned = !(t.pinned && t.pinnedToPlaylistId === playlistId)
+        return { ...t, pinned, pinnedToPlaylistId: pinned ? playlistId : null }
+      })
+      saveTagsToStorage(results)
+      return { results }
     })
-  })),
+  },
 }))
