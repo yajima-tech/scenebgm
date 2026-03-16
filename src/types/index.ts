@@ -32,6 +32,12 @@ export interface PinnedTrack extends Track {
   sceneIcon: string
 }
 
+export interface Playlist {
+  id: string
+  name: string
+  trackIds: string[]
+}
+
 export interface SEItem {
   id: string
   emoji: string

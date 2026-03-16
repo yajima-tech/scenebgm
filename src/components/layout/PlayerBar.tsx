@@ -12,20 +12,22 @@ export function PlayerBar() {
 
   return (
     <footer
-      className="flex items-center px-5 gap-6"
+      className="flex items-center"
       style={{
         gridColumn: '1 / -1',
-        background: 'var(--bg2)',
-        borderTop: '1px solid var(--border)',
-        height: 80,
+        background: '#13161e',
+        borderTop: '1px solid rgba(255,255,255,0.07)',
+        height: 72,
+        padding: '0 24px',
+        gap: 16,
       }}
     >
       {/* Left: Track info */}
       <div className="flex flex-col gap-0.5 min-w-[140px]">
-        <span className="text-sm font-medium truncate" style={{ color: 'var(--text)' }}>
+        <span className="font-medium truncate" style={{ color: 'var(--text)', fontSize: 14 }}>
           {currentTrack ? currentTrack.name : '再生中のトラックなし'}
         </span>
-        <span className="text-xs" style={{ color: 'var(--muted)' }}>
+        <span style={{ color: 'var(--muted)', fontSize: 12 }}>
           {currentTrack ? 'Freesound · CC0' : '—'}
         </span>
       </div>
@@ -33,26 +35,29 @@ export function PlayerBar() {
       {/* Center: Controls */}
       <div className="flex items-center gap-3">
         <button
-          className="text-lg cursor-pointer"
-          style={{ color: 'var(--muted2)', background: 'none', border: 'none' }}
+          className="cursor-pointer"
+          style={{ color: 'var(--muted2)', background: 'none', border: 'none', fontSize: 16 }}
         >
           ⟨⟨
         </button>
         <button
           onClick={pause}
-          className="w-9 h-9 rounded-full flex items-center justify-center text-lg cursor-pointer"
+          className="rounded-full flex items-center justify-center cursor-pointer"
           style={{
+            width: 38,
+            height: 38,
             background: currentTrack ? 'var(--accent)' : 'var(--bg3)',
             color: currentTrack ? 'var(--bg)' : 'var(--muted)',
             border: 'none',
+            fontSize: 16,
           }}
         >
           {isPlaying ? '▐▐' : '▶'}
         </button>
         <button
           onClick={stop}
-          className="text-lg cursor-pointer"
-          style={{ color: 'var(--muted2)', background: 'none', border: 'none' }}
+          className="cursor-pointer"
+          style={{ color: 'var(--muted2)', background: 'none', border: 'none', fontSize: 16 }}
         >
           ⟩⟩
         </button>
@@ -61,20 +66,18 @@ export function PlayerBar() {
       {/* Center-right: Progress */}
       <div className="flex items-center gap-2 flex-1">
         <span
-          className="text-xs"
-          style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", minWidth: 32, textAlign: 'right' }}
+          style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", minWidth: 32, textAlign: 'right', fontSize: 12 }}
         >
           {formatTime(currentTime)}
         </span>
-        <div className="flex-1 h-1 rounded-full" style={{ background: 'var(--bg3)' }}>
+        <div className="flex-1 rounded-full" style={{ background: 'var(--bg3)', height: 4 }}>
           <div
             className="h-full rounded-full transition-all"
             style={{ width: `${progress}%`, background: 'var(--accent)' }}
           />
         </div>
         <span
-          className="text-xs"
-          style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", minWidth: 32 }}
+          style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", minWidth: 32, fontSize: 12 }}
         >
           {formatTime(duration)}
         </span>
@@ -83,17 +86,19 @@ export function PlayerBar() {
       {/* Right: Volume + add */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1.5">
-          <span className="text-sm" style={{ color: 'var(--muted2)' }}>🔊</span>
-          <div className="w-16 h-1 rounded-full" style={{ background: 'var(--bg3)' }}>
+          <span style={{ color: 'var(--muted2)', fontSize: 14 }}>🔊</span>
+          <div className="w-16 rounded-full" style={{ background: 'var(--bg3)', height: 4 }}>
             <div className="h-full rounded-full w-3/4" style={{ background: 'var(--muted2)' }} />
           </div>
         </div>
         <button
-          className="px-3 py-1 rounded-md text-xs font-medium cursor-pointer"
+          className="rounded-md font-medium cursor-pointer"
           style={{
             border: '1px solid var(--border-hi)',
             color: 'var(--muted2)',
             background: 'transparent',
+            fontSize: 11,
+            padding: '6px 12px',
           }}
         >
           + リストに追加

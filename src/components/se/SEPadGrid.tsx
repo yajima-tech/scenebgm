@@ -101,7 +101,7 @@ function SEPad({ item, isLive }: { item: SEItem; isLive?: boolean }) {
 
       {/* Top: emoji + dur */}
       <div className="flex items-start justify-between mb-1">
-        <span className="text-xl">{item.emoji}</span>
+        <span style={{ fontSize: 22 }}>{item.emoji}</span>
         <span
           className="text-xs"
           style={{ color: 'var(--muted2)', fontFamily: "'DM Mono', monospace" }}
@@ -111,12 +111,12 @@ function SEPad({ item, isLive }: { item: SEItem; isLive?: boolean }) {
       </div>
 
       {/* Name */}
-      <div className="text-sm font-semibold mb-0.5" style={{ color: 'var(--text)' }}>
+      <div className="font-semibold mb-0.5" style={{ color: 'var(--text)', fontSize: 13 }}>
         {item.name}
       </div>
 
       {/* Sub */}
-      <div className="text-xs mb-2" style={{ color: 'var(--muted2)' }}>
+      <div className="mb-2" style={{ color: 'var(--muted2)', fontSize: 11 }}>
         {item.sub}
       </div>
 

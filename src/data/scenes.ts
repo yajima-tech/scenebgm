@@ -3,22 +3,9 @@ import type { Scene } from '../types'
 export const SCENES: Scene[] = [
   {
     id: 'nyuure', icon: '🚪', name: '客入れ',
-    sub: '開場〜開演前 / 来場者を迎える',
-    bpm: '80–110', mood: '落ち着き・期待感', dur: 'ループ推奨', count: '18曲',
-    tracks: [
-      { id: 't1', name: 'Gentle Morning Jazz',  tags: ['ジャズ','ループ可'], mood: '落ち着き', bpm: 88,  dur: '3:22', score: 96 },
-      { id: 't2', name: 'Bossa Nova Lounge',    tags: ['ボッサ','ループ可'], mood: '期待感',  bpm: 94,  dur: '4:05', score: 91 },
-      { id: 't3', name: 'Sunday Morning Cafe',  tags: ['アコギ','ループ可'], mood: '穏やか',  bpm: 82,  dur: '3:48', score: 87 },
-    ],
-  },
-  {
-    id: 'kyakudashi', icon: '🌅', name: '客出し',
-    sub: '閉演後 / 余韻を残して送り出す',
-    bpm: '70–100', mood: '余韻・温かみ', dur: 'フェードアウト可', count: '14曲',
-    tracks: [
-      { id: 't4', name: 'Twilight Waltz',             tags: ['ピアノ'],  mood: '余韻',   bpm: 78, dur: '3:55', score: 95 },
-      { id: 't5', name: 'Au Revoir (String Ensemble)', tags: ['弦楽'],   mood: '温かみ', bpm: 72, dur: '4:20', score: 90 },
-    ],
+    sub: '開場〜開演 / 期待感とムードを演出する',
+    bpm: '80–115', mood: 'ムーディー・わくわく感', dur: 'ループ推奨', count: '18曲',
+    tracks: [],
   },
   {
     id: 'opening', icon: '🎬', name: 'オープニング',

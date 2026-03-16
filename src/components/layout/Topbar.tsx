@@ -8,19 +8,21 @@ interface Props {
 export function Topbar({ tab, onTabChange }: Props) {
   return (
     <header
-      className="flex items-center justify-between px-5"
+      className="flex items-center justify-between"
       style={{
         gridColumn: '1 / -1',
-        background: 'var(--bg2)',
-        borderBottom: '1px solid var(--border)',
-        height: 52,
+        background: '#13161e',
+        borderBottom: '1px solid rgba(255,255,255,0.07)',
+        height: 64,
+        padding: '0 24px',
+        gap: 20,
       }}
     >
       {/* Left: Logo */}
       <div className="flex items-center gap-2">
         <span
-          className="text-lg font-bold tracking-tight"
-          style={{ fontFamily: "'DM Mono', monospace", color: 'var(--accent)' }}
+          className="font-bold tracking-tight"
+          style={{ fontFamily: "'DM Mono', monospace", color: 'var(--accent)', fontSize: 20 }}
         >
           sceneBGM
         </span>
@@ -32,10 +34,12 @@ export function Topbar({ tab, onTabChange }: Props) {
           <button
             key={t}
             onClick={() => onTabChange(t)}
-            className="px-4 py-1 rounded-md text-sm font-semibold transition-all cursor-pointer"
+            className="rounded-md font-semibold transition-all cursor-pointer"
             style={{
               background: tab === t ? 'var(--accent)' : 'transparent',
               color: tab === t ? 'var(--bg)' : 'var(--muted2)',
+              fontSize: 14,
+              padding: '8px 18px',
             }}
           >
             {t.toUpperCase()}

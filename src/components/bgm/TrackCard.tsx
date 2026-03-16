@@ -21,46 +21,109 @@ export function TrackCard({ track, isPinnedView, sceneName, sceneIcon }: Props) 
 
   return (
     <div
-      className="rounded-lg p-4 transition-all"
       style={{
         background: pinned
           ? 'linear-gradient(135deg, rgba(232,185,106,0.13) 0%, rgba(232,185,106,0.05) 100%)'
-          : 'var(--bg2)',
+          : '#13161e',
         border: pinned
           ? '1px solid rgba(232,185,106,0.55)'
-          : '1px solid var(--border)',
+          : '1px solid rgba(255,255,255,0.07)',
         boxShadow: pinned
           ? '0 0 0 1px rgba(232,185,106,0.2), inset 0 0 24px rgba(232,185,106,0.07)'
           : 'none',
+        borderRadius: 12,
+        padding: '14px 16px',
+        marginBottom: 10,
+        display: 'grid',
+        gridTemplateColumns: '40px 1fr auto',
+        gap: 12,
+        alignItems: 'center',
       }}
     >
-      {/* Row 1: Play, Name, Duration, Score, Pin, Expand */}
-      <div className="flex items-center gap-3 mb-2">
-        <button
-          className="w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0 cursor-pointer"
-          style={{
-            background: 'var(--bg3)',
-            border: '1px solid var(--border-hi)',
-            color: 'var(--text)',
-          }}
-        >
-          ▶
-        </button>
-        <span className="flex-1 font-semibold text-sm truncate" style={{ color: 'var(--text)' }}>
+      {/* Play button */}
+      <button
+        className="rounded-full flex items-center justify-center shrink-0 cursor-pointer"
+        style={{
+          width: 40,
+          height: 40,
+          background: 'var(--bg3)',
+          border: '1px solid var(--border-hi)',
+          color: 'var(--text)',
+          fontSize: 14,
+        }}
+      >
+        ▶
+      </button>
+
+      {/* Center content */}
+      <div className="flex flex-col gap-1.5 min-w-0">
+        <span className="font-semibold truncate" style={{ color: 'var(--text)', fontSize: 15 }}>
           {track.name}
         </span>
+        <div className="flex items-center gap-2 flex-wrap" style={{ color: 'var(--muted2)' }}>
+          {isPinnedView && sceneName && (
+            <span
+              style={{
+                fontSize: 10,
+                padding: '2px 7px',
+                borderRadius: 99,
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                color: 'var(--muted2)',
+              }}
+            >
+              {sceneIcon} {sceneName}
+            </span>
+          )}
+          <span style={{ color: 'var(--accent)', fontSize: 11 }}>{track.mood}</span>
+          <span style={{ color: 'var(--muted)', fontSize: 11 }}>/</span>
+          {track.tags.map((t) => (
+            <span
+              key={t}
+              className="rounded"
+              style={{ background: 'var(--bg3)', color: 'var(--muted2)', fontSize: 11, padding: '3px 8px' }}
+            >
+              {t}
+            </span>
+          ))}
+          <span style={{ color: 'var(--muted)', fontSize: 11 }}>/</span>
+          <span
+            style={{
+              fontFamily: "'DM Mono', monospace",
+              color: bpmChanged ? 'var(--accent)' : 'var(--muted2)',
+              fontSize: 11,
+            }}
+          >
+            {param.bpm} BPM
+          </span>
+          {pitchChanged && (
+            <>
+              <span style={{ color: 'var(--muted)', fontSize: 11 }}>·</span>
+              <span style={{ fontFamily: "'DM Mono', monospace", color: 'var(--accent2)', fontSize: 11 }}>
+                {param.pitch > 0 ? '+' : ''}{param.pitch} st
+              </span>
+            </>
+          )}
+        </div>
+        <Waveform />
+      </div>
+
+      {/* Right controls */}
+      <div className="flex items-center gap-2">
         <span
-          className="text-xs shrink-0"
-          style={{ color: 'var(--muted2)', fontFamily: "'DM Mono', monospace" }}
+          className="shrink-0"
+          style={{ color: 'var(--muted2)', fontFamily: "'DM Mono', monospace", fontSize: 12 }}
         >
           {track.dur}
         </span>
         <span
-          className="text-xs font-bold px-2 py-0.5 rounded shrink-0"
+          className="font-bold rounded shrink-0"
           style={{
             background: 'rgba(232,185,106,0.12)',
             color: 'var(--accent)',
             fontFamily: "'DM Mono', monospace",
+            fontSize: 12,
+            padding: '3px 8px',
           }}
         >
           {track.score}%
@@ -70,8 +133,8 @@ export function TrackCard({ track, isPinnedView, sceneName, sceneIcon }: Props) 
           onClick={() => togglePin(track.id)}
           className="shrink-0 flex items-center justify-center cursor-pointer"
           style={{
-            width: 32,
-            height: 32,
+            width: 34,
+            height: 34,
             borderRadius: 8,
             border: pinned ? '1px solid #e8b96a' : '1px solid var(--border-hi)',
             background: pinned ? '#e8b96a' : 'var(--bg3)',
@@ -90,8 +153,8 @@ export function TrackCard({ track, isPinnedView, sceneName, sceneIcon }: Props) 
           onClick={() => setExpanded(!expanded)}
           className="shrink-0 flex items-center justify-center cursor-pointer"
           style={{
-            width: 32,
-            height: 32,
+            width: 34,
+            height: 34,
             borderRadius: 8,
             border: '1px solid var(--border-hi)',
             background: expanded ? 'rgba(106,212,232,0.12)' : 'var(--bg3)',
@@ -104,63 +167,10 @@ export function TrackCard({ track, isPinnedView, sceneName, sceneIcon }: Props) 
         </button>
       </div>
 
-      {/* Row 2: Meta */}
-      <div className="flex items-center gap-2 mb-2 text-xs pl-11 flex-wrap" style={{ color: 'var(--muted2)' }}>
-        {/* Scene badge (pinned view only) */}
-        {isPinnedView && sceneName && (
-          <span
-            style={{
-              fontSize: 10,
-              padding: '2px 7px',
-              borderRadius: 99,
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.12)',
-              color: 'var(--muted2)',
-            }}
-          >
-            {sceneIcon} {sceneName}
-          </span>
-        )}
-        <span style={{ color: 'var(--accent)' }}>{track.mood}</span>
-        <span style={{ color: 'var(--muted)' }}>/</span>
-        {track.tags.map((t) => (
-          <span
-            key={t}
-            className="px-1.5 py-0.5 rounded"
-            style={{ background: 'var(--bg3)', color: 'var(--muted2)', fontSize: 11 }}
-          >
-            {t}
-          </span>
-        ))}
-        <span style={{ color: 'var(--muted)' }}>/</span>
-        <span
-          style={{
-            fontFamily: "'DM Mono', monospace",
-            color: bpmChanged ? 'var(--accent)' : undefined,
-          }}
-        >
-          {param.bpm} BPM
-        </span>
-        {pitchChanged && (
-          <>
-            <span style={{ color: 'var(--muted)' }}>·</span>
-            <span style={{ fontFamily: "'DM Mono', monospace", color: 'var(--accent2)' }}>
-              {param.pitch > 0 ? '+' : ''}{param.pitch} st
-            </span>
-          </>
-        )}
-      </div>
-
-      {/* Row 3: Waveform */}
-      <div className="pl-11">
-        <Waveform />
-      </div>
-
       {/* Expandable: BPM & Pitch Controls */}
       {expanded && (
         <div
-          className="mt-3 pt-3"
-          style={{ borderTop: '1px solid var(--border)' }}
+          style={{ borderTop: '1px solid var(--border)', gridColumn: '1 / -1', paddingTop: 12, marginTop: 4 }}
         >
           <TrackControls trackId={track.id} baseBpm={track.bpm} />
         </div>

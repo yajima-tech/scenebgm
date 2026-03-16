@@ -16,8 +16,10 @@ function App() {
         height: '100vh',
         overflow: 'hidden',
         display: 'grid',
-        gridTemplateRows: '52px 1fr 80px',
-        gridTemplateColumns: '210px 1fr',
+        gridTemplateRows: '64px 1fr 72px',
+        gridTemplateColumns: '260px 1fr',
+        background: '#0d0f14',
+        fontFamily: "'Syne', sans-serif",
       }}
     >
       <Topbar tab={tab} onTabChange={setTab} />
