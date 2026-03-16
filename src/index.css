@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0d0f14;
+  --color-bg2: #13161e;
+  --color-bg3: #1a1d28;
+  --color-border: rgba(255,255,255,0.07);
+  --color-border-hi: rgba(255,255,255,0.14);
+  --color-accent: #e8b96a;
+  --color-accent2: #6ad4e8;
+  --color-accent3: #b06ae8;
+  --color-live: #e05555;
+  --color-text: #e8e6df;
+  --color-muted: #6b6a64;
+  --color-muted2: #9e9d97;
+}
+
+:root {
+  --bg:       #0d0f14;
+  --bg2:      #13161e;
+  --bg3:      #1a1d28;
+  --border:   rgba(255,255,255,0.07);
+  --border-hi:rgba(255,255,255,0.14);
+  --accent:   #e8b96a;
+  --accent2:  #6ad4e8;
+  --accent3:  #b06ae8;
+  --live:     #e05555;
+  --text:     #e8e6df;
+  --muted:    #6b6a64;
+  --muted2:   #9e9d97;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+}
+
+/* Waveform */
+.waveform {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 20px;
+}
+.waveform .bar {
+  width: 3px;
+  border-radius: 1px;
+  transition: background 0.2s;
+}
+.waveform .bar.played {
+  background: var(--accent);
+  opacity: 0.5;
+}
+.waveform .bar.unplayed {
+  background: var(--muted2);
+  opacity: 0.2;
+}
+
+/* SE Pad Ripple */
+@keyframes se-ripple {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(5); opacity: 0; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-hi);
+  border-radius: 3px;
+}
