@@ -5,6 +5,7 @@ import { PlayerBar } from './components/layout/PlayerBar'
 import { SearchPanel } from './components/search/SearchPanel'
 import { ScenePanel } from './components/scene/ScenePanel'
 import { SEPanel } from './components/se/SEPanel'
+import { AiGenPanel } from './components/aigen/AiGenPanel'
 
 function App() {
   const { currentTab } = useAppStore()
@@ -14,10 +15,11 @@ function App() {
       case 'bgm':    return <ScenePanel />
       case 'se':     return <SEPanel />
       case 'search': return <SearchPanel />
+      case 'aigen':  return <AiGenPanel />
     }
   }
 
-  const showSidebar = currentTab !== 'se'
+  const showSidebar = currentTab === 'bgm' || currentTab === 'search'
 
   return (
     <div

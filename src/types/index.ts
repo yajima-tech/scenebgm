@@ -1,4 +1,4 @@
-export type AppTab = 'bgm' | 'se' | 'search'
+export type AppTab = 'bgm' | 'se' | 'search' | 'aigen'
 
 export interface FreesoundTrack {
   id: number

@@ -5,6 +5,7 @@ const TABS: { key: AppTab; label: string }[] = [
   { key: 'bgm',    label: 'BGM' },
   { key: 'se',     label: 'SE' },
   { key: 'search', label: '検索' },
+  { key: 'aigen',  label: '✦ AI生成' },
 ]
 
 export function Topbar() {
