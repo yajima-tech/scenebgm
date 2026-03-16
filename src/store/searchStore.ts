@@ -1,24 +1,33 @@
 import { create } from 'zustand'
 import type { FreesoundTrack } from '../types'
 import { searchBGM } from '../audio/freesound'
-import { getPresetAsFreesoundTracks } from '../data/presets'
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
 const STORAGE_KEY = 'scenebgm-track-tags'
+const TRACKS_KEY  = 'scenebgm-track-data'
 
 function saveTagsToStorage(results: FreesoundTrack[]) {
-  const data: Record<string, { scenes: string[]; pinned: boolean; pinnedToPlaylistId: string | null }> = {}
+  const tagData: Record<string, { scenes: string[]; pinned: boolean; pinnedToPlaylistId: string | null }> = {}
+  const trackData: Record<string, object> = {}
+
   results.forEach(t => {
     if (t.scenes.size > 0 || t.pinned) {
-      data[String(t.id)] = {
+      const id = String(t.id)
+      tagData[id] = {
         scenes: Array.from(t.scenes),
         pinned: t.pinned,
         pinnedToPlaylistId: t.pinnedToPlaylistId,
       }
+      trackData[id] = {
+        ...t,
+        scenes: Array.from(t.scenes),
+      }
     }
   })
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(tagData))
+  localStorage.setItem(TRACKS_KEY, JSON.stringify(trackData))
 }
 
 function loadTagsFromStorage(): Record<string, { scenes: string[]; pinned: boolean; pinnedToPlaylistId: string | null }> {
@@ -27,6 +36,20 @@ function loadTagsFromStorage(): Record<string, { scenes: string[]; pinned: boole
     return raw ? JSON.parse(raw) : {}
   } catch {
     return {}
+  }
+}
+
+function loadSavedTracks(): FreesoundTrack[] {
+  try {
+    const raw = localStorage.getItem(TRACKS_KEY)
+    if (!raw) return []
+    const data = JSON.parse(raw) as Record<string, Record<string, unknown>>
+    return Object.values(data).map((t) => ({
+      ...(t as unknown as FreesoundTrack),
+      scenes: new Set<string>((t.scenes as string[]) ?? []),
+    }))
+  } catch {
+    return []
   }
 }
 
@@ -72,7 +95,7 @@ function debouncedFetch(get: () => SearchState) {
 }
 
 export const useSearchStore = create<SearchState>((set, get) => ({
-  results: getPresetAsFreesoundTracks(),
+  results: loadSavedTracks(),
   loading: false,
   error: null,
 
@@ -119,7 +142,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       freeWord,
     ].filter(Boolean)
 
-    if (!parts.length) { set({ results: getPresetAsFreesoundTracks(), loading: false }); return }
+    if (!parts.length) { set({ results: loadSavedTracks(), loading: false }); return }
 
     set({ loading: true, error: null })
     try {
@@ -138,18 +161,18 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       const savedTags = loadTagsFromStorage()
       const merged: FreesoundTrack[] = filtered.map(r => {
         const saved = savedTags[String(r.id)]
-        const prev = prevMap.get(r.id)
+        const p = prevMap.get(r.id)
         return {
           ...r,
           scenes: saved
             ? new Set(saved.scenes)
-            : prev?.scenes ?? new Set(),
+            : p?.scenes ?? new Set(),
           pinned: saved
             ? saved.pinned
-            : prev?.pinned ?? false,
+            : p?.pinned ?? false,
           pinnedToPlaylistId: saved
             ? saved.pinnedToPlaylistId
-            : prev?.pinnedToPlaylistId ?? null,
+            : p?.pinnedToPlaylistId ?? null,
         }
       })
       set({ results: merged, loading: false })

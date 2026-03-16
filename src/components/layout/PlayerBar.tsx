@@ -7,89 +7,88 @@ function formatTime(sec: number): string {
 }
 
 export function PlayerBar() {
-  const { currentTrack, isPlaying, pause, stop, currentTime, duration } = useAudioPlayer()
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0
+  const {
+    currentTrack, isPlaying, pause, stop,
+    currentTime, duration, seek,
+    playbackRate, setPlaybackRate,
+    detune, setDetune,
+  } = useAudioPlayer()
+
+  function handleProgressClick(e: React.MouseEvent<HTMLDivElement>) {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const ratio = (e.clientX - rect.left) / rect.width
+    seek(ratio * duration)
+  }
 
   return (
-    <footer
-      className="flex items-center"
-      style={{
-        gridColumn: '1 / -1',
-        background: '#13161e',
-        borderTop: '1px solid rgba(255,255,255,0.07)',
-        height: 70,
-        padding: '0 24px',
-        gap: 16,
-      }}
-    >
-      {/* Left: Track info */}
-      <div className="flex flex-col gap-0.5 min-w-[140px]">
-        <span className="font-medium truncate" style={{ color: 'var(--text)', fontSize: 14 }}>
-          {currentTrack ? currentTrack.name : '再生中のトラックなし'}
-        </span>
-        <span style={{ color: 'var(--muted)', fontSize: 12 }}>
-          {currentTrack ? 'Freesound · CC0' : '—'}
-        </span>
-      </div>
-
-      {/* Center: Controls */}
-      <div className="flex items-center gap-3">
-        <button
-          className="cursor-pointer"
-          style={{ color: 'var(--muted2)', background: 'none', border: 'none', fontSize: 16 }}
-        >
-          ⟨⟨
-        </button>
-        <button
-          onClick={pause}
-          className="rounded-full flex items-center justify-center cursor-pointer"
-          style={{
-            width: 38,
-            height: 38,
-            background: currentTrack ? 'var(--accent)' : 'var(--bg3)',
-            color: currentTrack ? 'var(--bg)' : 'var(--muted)',
-            border: 'none',
-            fontSize: 16,
-          }}
-        >
-          {isPlaying ? '▐▐' : '▶'}
-        </button>
-        <button
-          onClick={stop}
-          className="cursor-pointer"
-          style={{ color: 'var(--muted2)', background: 'none', border: 'none', fontSize: 16 }}
-        >
-          ⟩⟩
-        </button>
-      </div>
-
-      {/* Center-right: Progress */}
-      <div className="flex items-center gap-2 flex-1">
-        <span
-          style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", minWidth: 32, textAlign: 'right', fontSize: 12 }}
-        >
-          {formatTime(currentTime)}
-        </span>
-        <div className="flex-1 rounded-full" style={{ background: 'var(--bg3)', height: 4 }}>
-          <div
-            className="h-full rounded-full transition-all"
-            style={{ width: `${progress}%`, background: 'var(--accent)' }}
-          />
+    <footer className="player">
+      {/* 1行目: 既存コントロール */}
+      <div className="player-row1">
+        <div className="pl-info">
+          <span className="pl-name">{currentTrack ? currentTrack.name : '再生中のトラックなし'}</span>
+          <span className="pl-sub">{currentTrack ? 'Freesound · CC0' : '—'}</span>
         </div>
-        <span
-          style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", minWidth: 32, fontSize: 12 }}
-        >
-          {formatTime(duration)}
-        </span>
-      </div>
-
-      {/* Right: Volume */}
-      <div className="flex items-center gap-1.5">
-        <span style={{ color: 'var(--muted2)', fontSize: 14 }}>🔊</span>
-        <div className="w-16 rounded-full" style={{ background: 'var(--bg3)', height: 4 }}>
-          <div className="h-full rounded-full w-3/4" style={{ background: 'var(--muted2)' }} />
+        <div className="pl-ctrls">
+          <button className="ctrl-skip" style={{ color: 'var(--muted2)', background: 'none', border: 'none', fontSize: 16, cursor: 'pointer' }}>⟨⟨</button>
+          <button
+            onClick={pause}
+            className="ctrl-play"
+            style={{
+              background: currentTrack ? 'var(--accent)' : 'var(--bg3)',
+              color: currentTrack ? 'var(--bg)' : 'var(--muted)',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            {isPlaying ? '▐▐' : '▶'}
+          </button>
+          <button
+            onClick={stop}
+            className="ctrl-skip"
+            style={{ color: 'var(--muted2)', background: 'none', border: 'none', fontSize: 16, cursor: 'pointer' }}
+          >⟩⟩</button>
+        </div>
+        <div className="prog-wrap">
+          <span className="prog-time">{formatTime(currentTime)}</span>
+          <div className="prog-bar" onClick={handleProgressClick} style={{ cursor: 'pointer' }}>
+            <div className="prog-fill" style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%` }}>
+              <div className="prog-thumb" />
+            </div>
+          </div>
+          <span className="prog-time">{formatTime(duration)}</span>
         </div>
       </div>
+
+      {/* 2行目: BPM・音程スライダー */}
+      {currentTrack && (
+        <div className="player-row2">
+          <div className="ctrl-group">
+            <span className="ctrl-label">BPM</span>
+            <input
+              type="range" min="0.5" max="2.0" step="0.01"
+              value={playbackRate}
+              onChange={e => setPlaybackRate(parseFloat(e.target.value))}
+              style={{ accentColor: '#e8b96a' }}
+            />
+            <span className="ctrl-val">{Math.round(playbackRate * 100)}%</span>
+            <button className="ctrl-reset" onClick={() => setPlaybackRate(1.0)}>↺</button>
+          </div>
+          <div className="ctrl-sep" />
+          <div className="ctrl-group">
+            <span className="ctrl-label">音程</span>
+            <input
+              type="range" min="-1200" max="1200" step="100"
+              value={detune}
+              onChange={e => setDetune(parseInt(e.target.value))}
+              style={{ accentColor: '#6ad4e8' }}
+            />
+            <span className="ctrl-val" style={{ color: detune !== 0 ? '#6ad4e8' : undefined }}>
+              {detune > 0 ? '+' : ''}{detune / 100} st
+            </span>
+            <button className="ctrl-reset" onClick={() => setDetune(0)}>↺</button>
+          </div>
+        </div>
+      )}
     </footer>
   )
 }

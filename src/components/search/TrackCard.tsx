@@ -18,7 +18,7 @@ export function TrackCard({ track }: Props) {
   const { toggleScene, togglePin } = useSearchStore()
   const { playlists, activePlaylistId } = usePlaylistStore()
   const effectivePlaylistId = activePlaylistId ?? playlists[0]?.id ?? 'default'
-  const { currentTrack, isPlaying, play, pause } = useAudioPlayer()
+  const { currentTrack, isPlaying, play, pause, loop, toggleLoop } = useAudioPlayer()
   const isCurrentTrack = currentTrack?.id === track.id
   const isCurrentPlaying = isCurrentTrack && isPlaying
 
@@ -51,6 +51,15 @@ export function TrackCard({ track }: Props) {
             <span className="t-cc0">CC0</span>
           </div>
         </div>
+        {isCurrentTrack && (
+          <button
+            className={`loop-btn${loop ? ' on' : ''}`}
+            onClick={toggleLoop}
+            title={loop ? 'ループ解除' : 'ループ再生'}
+          >
+            🔁
+          </button>
+        )}
         <button
           className={`pin-btn${track.pinned ? ' on' : ''}`}
           onClick={() => togglePin(track.id, effectivePlaylistId)}
