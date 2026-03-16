@@ -1,57 +1,9 @@
 import { create } from 'zustand'
 import type { FreesoundTrack, Scene } from '../types'
 import { searchBGM } from '../audio/freesound'
+import { saveTracksToStorage, loadSavedTracks } from '../utils/storage'
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
-
-const STORAGE_KEY = 'scenebgm-track-tags'
-const TRACKS_KEY  = 'scenebgm-track-data'
-
-function saveTagsToStorage(results: FreesoundTrack[]) {
-  const tagData: Record<string, { scenes: string[]; pinned: boolean; pinnedToPlaylistId: string | null }> = {}
-  const trackData: Record<string, object> = {}
-
-  results.forEach(t => {
-    if (t.scenes.size > 0 || t.pinned) {
-      const id = String(t.id)
-      tagData[id] = {
-        scenes: Array.from(t.scenes),
-        pinned: t.pinned,
-        pinnedToPlaylistId: t.pinnedToPlaylistId,
-      }
-      trackData[id] = {
-        ...t,
-        scenes: Array.from(t.scenes),
-      }
-    }
-  })
-
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(tagData))
-  localStorage.setItem(TRACKS_KEY, JSON.stringify(trackData))
-}
-
-function loadTagsFromStorage(): Record<string, { scenes: string[]; pinned: boolean; pinnedToPlaylistId: string | null }> {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : {}
-  } catch {
-    return {}
-  }
-}
-
-function loadSavedTracks(): FreesoundTrack[] {
-  try {
-    const raw = localStorage.getItem(TRACKS_KEY)
-    if (!raw) return []
-    const data = JSON.parse(raw) as Record<string, Record<string, unknown>>
-    return Object.values(data).map((t) => ({
-      ...(t as unknown as FreesoundTrack),
-      scenes: new Set<string>((t.scenes as string[]) ?? []),
-    }))
-  } catch {
-    return []
-  }
-}
 
 interface SearchState {
   results: FreesoundTrack[]
@@ -95,8 +47,10 @@ function debouncedFetch(get: () => SearchState) {
   debounceTimer = setTimeout(() => { get().fetchResults() }, 300)
 }
 
+const restoredTracks = loadSavedTracks()
+
 export const useSearchStore = create<SearchState>((set, get) => ({
-  results: loadSavedTracks(),
+  results: restoredTracks,
   loading: false,
   error: null,
 
@@ -157,26 +111,27 @@ export const useSearchStore = create<SearchState>((set, get) => ({
         if (durMax && dur > parseFloat(durMax)) return false
         return true
       })
-      const prev = get().results
-      const prevMap = new Map(prev.map(t => [t.id, t]))
-      const savedTags = loadTagsFromStorage()
+
+      const savedTracks = loadSavedTracks()
+      const savedMap = new Map(savedTracks.map(t => [String(t.id), t]))
+      const prevMap = new Map(get().results.map(t => [String(t.id), t]))
+
       const merged: FreesoundTrack[] = filtered.map(r => {
-        const saved = savedTags[String(r.id)]
-        const p = prevMap.get(r.id)
+        const saved = savedMap.get(String(r.id))
+        const prev = prevMap.get(String(r.id))
         return {
           ...r,
-          scenes: saved
-            ? new Set(saved.scenes)
-            : p?.scenes ?? new Set(),
-          pinned: saved
-            ? saved.pinned
-            : p?.pinned ?? false,
-          pinnedToPlaylistId: saved
-            ? saved.pinnedToPlaylistId
-            : p?.pinnedToPlaylistId ?? null,
+          scenes: saved?.scenes ?? prev?.scenes ?? new Set(),
+          pinned: saved?.pinned ?? prev?.pinned ?? false,
+          pinnedToPlaylistId: saved?.pinnedToPlaylistId ?? prev?.pinnedToPlaylistId ?? null,
         }
       })
-      set({ results: merged, loading: false })
+
+      // 保存済みトラックで新規取得結果にないものも結果に含める
+      const newIds = new Set(merged.map(t => String(t.id)))
+      const savedOnly = savedTracks.filter(t => !newIds.has(String(t.id)))
+
+      set({ results: [...merged, ...savedOnly], loading: false })
     } catch (e: unknown) {
       set({ error: e instanceof Error ? e.message : String(e), loading: false })
     }
@@ -190,7 +145,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
         next.has(sceneId) ? next.delete(sceneId) : next.add(sceneId)
         return { ...t, scenes: next }
       })
-      saveTagsToStorage(results)
+      saveTracksToStorage(results)
       return { results }
     })
   },
@@ -202,7 +157,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
         const pinned = !(t.pinned && t.pinnedToPlaylistId === playlistId)
         return { ...t, pinned, pinnedToPlaylistId: pinned ? playlistId : null }
       })
-      saveTagsToStorage(results)
+      saveTracksToStorage(results)
       return { results }
     })
   },

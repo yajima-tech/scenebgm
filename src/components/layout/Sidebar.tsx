@@ -6,8 +6,6 @@ import { usePlaylistStore } from '../../store/playlistStore'
 import { useAppStore } from '../../store/appStore'
 
 export function Sidebar() {
-  const { currentTab } = useAppStore()
-
   return (
     <aside
       style={{
@@ -19,7 +17,9 @@ export function Sidebar() {
         overflowX: 'hidden',
       }}
     >
-      {currentTab === 'playlist' ? <PlaylistSidebar /> : <SceneSidebar />}
+      <SceneSidebar />
+      <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '12px 0' }} />
+      <PlaylistSidebar />
     </aside>
   )
 }
@@ -27,7 +27,7 @@ export function Sidebar() {
 function SceneSidebar() {
   const { currentSceneId, setScene } = useSceneStore()
   const { results, initFiltersForScene } = useSearchStore()
-  const { setTab } = useAppStore()
+  const { currentTab, setTab } = useAppStore()
 
   return (
     <div className="flex flex-col">
@@ -42,8 +42,8 @@ function SceneSidebar() {
             icon={s.icon}
             label={s.name}
             sub={count > 0 ? `${count}曲` : undefined}
-            active={currentSceneId === s.id}
-            onClick={() => { setScene(s.id); setTab('scenes'); initFiltersForScene(s) }}
+            active={currentTab === 'bgm' && currentSceneId === s.id}
+            onClick={() => { setScene(s.id); setTab('bgm'); initFiltersForScene(s) }}
           />
         )
       })}

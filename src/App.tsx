@@ -4,7 +4,6 @@ import { Sidebar } from './components/layout/Sidebar'
 import { PlayerBar } from './components/layout/PlayerBar'
 import { SearchPanel } from './components/search/SearchPanel'
 import { ScenePanel } from './components/scene/ScenePanel'
-import { PlaylistPanel } from './components/playlist/PlaylistPanel'
 import { SEPanel } from './components/se/SEPanel'
 
 function App() {
@@ -12,10 +11,9 @@ function App() {
 
   const MainPanel = () => {
     switch (currentTab) {
-      case 'search':   return <SearchPanel />
-      case 'scenes':   return <ScenePanel />
-      case 'playlist': return <PlaylistPanel />
-      case 'se':       return <SEPanel />
+      case 'bgm':    return <ScenePanel />
+      case 'se':     return <SEPanel />
+      case 'search': return <SearchPanel />
     }
   }
 
@@ -28,7 +26,7 @@ function App() {
         height: '100vh',
         overflow: 'hidden',
         display: 'grid',
-        gridTemplateRows: '60px 1fr 70px',
+        gridTemplateRows: '60px 1fr auto',
         gridTemplateColumns: showSidebar ? '240px 1fr' : '1fr',
         background: '#0d0f14',
         fontFamily: "'Syne', sans-serif",

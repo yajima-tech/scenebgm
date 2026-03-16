@@ -2,10 +2,9 @@ import type { AppTab } from '../../types'
 import { useAppStore } from '../../store/appStore'
 
 const TABS: { key: AppTab; label: string }[] = [
-  { key: 'search',   label: '検索' },
-  { key: 'scenes',   label: 'シーン' },
-  { key: 'playlist', label: 'プレイリスト' },
-  { key: 'se',       label: 'SE' },
+  { key: 'bgm',    label: 'BGM' },
+  { key: 'se',     label: 'SE' },
+  { key: 'search', label: '検索' },
 ]
 
 export function Topbar() {

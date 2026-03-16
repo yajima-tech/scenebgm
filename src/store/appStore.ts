@@ -7,6 +7,6 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>((set) => ({
-  currentTab: 'search',
+  currentTab: 'bgm',
   setTab: (tab) => set({ currentTab: tab }),
 }))
