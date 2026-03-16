@@ -1,41 +1,27 @@
-export type Tab = 'bgm' | 'se'
+export type AppTab = 'search' | 'scenes' | 'playlist' | 'se'
 
-export interface Track {
-  id: string
+export interface FreesoundTrack {
+  id: number
   name: string
+  bpm: number | null
+  duration: number
   tags: string[]
-  mood: string
-  bpm: number
-  dur: string
-  score: number
+  previews: { 'preview-hq-mp3': string }
+  license: string
+  scenes: Set<string>
+  pinned: boolean
+  pinnedToPlaylistId: string | null
 }
 
 export interface Scene {
   id: string
   icon: string
   name: string
-  sub: string
-  bpm: string
-  mood: string
-  dur: string
-  count: string
-  tracks: Track[]
-}
-
-export interface TrackParam {
-  bpm: number
-  pitch: number
-}
-
-export interface PinnedTrack extends Track {
-  sceneName: string
-  sceneIcon: string
 }
 
 export interface Playlist {
   id: string
   name: string
-  trackIds: string[]
 }
 
 export interface SEItem {

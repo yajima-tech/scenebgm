@@ -1,11 +1,16 @@
-import type { Tab } from '../../types'
+import type { AppTab } from '../../types'
+import { useAppStore } from '../../store/appStore'
 
-interface Props {
-  tab: Tab
-  onTabChange: (t: Tab) => void
-}
+const TABS: { key: AppTab; label: string }[] = [
+  { key: 'search',   label: '検索' },
+  { key: 'scenes',   label: 'シーン' },
+  { key: 'playlist', label: 'プレイリスト' },
+  { key: 'se',       label: 'SE' },
+]
 
-export function Topbar({ tab, onTabChange }: Props) {
+export function Topbar() {
+  const { currentTab, setTab } = useAppStore()
+
   return (
     <header
       className="flex items-center justify-between"
@@ -13,7 +18,7 @@ export function Topbar({ tab, onTabChange }: Props) {
         gridColumn: '1 / -1',
         background: '#13161e',
         borderBottom: '1px solid rgba(255,255,255,0.07)',
-        height: 64,
+        height: 60,
         padding: '0 24px',
         gap: 20,
       }}
@@ -30,19 +35,19 @@ export function Topbar({ tab, onTabChange }: Props) {
 
       {/* Center: Tabs */}
       <div className="flex gap-1 rounded-lg p-1" style={{ background: 'var(--bg3)' }}>
-        {(['bgm', 'se'] as Tab[]).map((t) => (
+        {TABS.map(({ key, label }) => (
           <button
-            key={t}
-            onClick={() => onTabChange(t)}
+            key={key}
+            onClick={() => setTab(key)}
             className="rounded-md font-semibold transition-all cursor-pointer"
             style={{
-              background: tab === t ? 'var(--accent)' : 'transparent',
-              color: tab === t ? 'var(--bg)' : 'var(--muted2)',
+              background: currentTab === key ? 'var(--accent)' : 'transparent',
+              color: currentTab === key ? 'var(--bg)' : 'var(--muted2)',
               fontSize: 14,
               padding: '8px 18px',
             }}
           >
-            {t.toUpperCase()}
+            {label}
           </button>
         ))}
       </div>

@@ -17,7 +17,7 @@ export function PlayerBar() {
         gridColumn: '1 / -1',
         background: '#13161e',
         borderTop: '1px solid rgba(255,255,255,0.07)',
-        height: 72,
+        height: 70,
         padding: '0 24px',
         gap: 16,
       }}
@@ -83,26 +83,12 @@ export function PlayerBar() {
         </span>
       </div>
 
-      {/* Right: Volume + add */}
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-1.5">
-          <span style={{ color: 'var(--muted2)', fontSize: 14 }}>🔊</span>
-          <div className="w-16 rounded-full" style={{ background: 'var(--bg3)', height: 4 }}>
-            <div className="h-full rounded-full w-3/4" style={{ background: 'var(--muted2)' }} />
-          </div>
+      {/* Right: Volume */}
+      <div className="flex items-center gap-1.5">
+        <span style={{ color: 'var(--muted2)', fontSize: 14 }}>🔊</span>
+        <div className="w-16 rounded-full" style={{ background: 'var(--bg3)', height: 4 }}>
+          <div className="h-full rounded-full w-3/4" style={{ background: 'var(--muted2)' }} />
         </div>
-        <button
-          className="rounded-md font-medium cursor-pointer"
-          style={{
-            border: '1px solid var(--border-hi)',
-            color: 'var(--muted2)',
-            background: 'transparent',
-            fontSize: 11,
-            padding: '6px 12px',
-          }}
-        >
-          + リストに追加
-        </button>
       </div>
     </footer>
   )
