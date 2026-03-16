@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { FreesoundTrack } from '../types'
+import type { FreesoundTrack, Scene } from '../types'
 import { searchBGM } from '../audio/freesound'
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
@@ -75,6 +75,7 @@ interface SearchState {
 
   toggleScene: (trackId: number, sceneId: string) => void
   togglePin: (trackId: number, playlistId: string) => void
+  initFiltersForScene: (scene: Scene) => void
 }
 
 const ME: Record<string,string> = {
@@ -204,5 +205,18 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       saveTagsToStorage(results)
       return { results }
     })
+  },
+
+  initFiltersForScene: (scene) => {
+    set({
+      selectedMoods: scene.defaultMoods,
+      selectedInsts: scene.defaultInsts,
+      bpmMin: '',
+      bpmMax: '',
+      durMin: '',
+      durMax: '',
+      freeWord: '',
+    })
+    get().fetchResults()
   },
 }))

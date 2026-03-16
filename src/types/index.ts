@@ -17,6 +17,8 @@ export interface Scene {
   id: string
   icon: string
   name: string
+  defaultMoods: string[]
+  defaultInsts: string[]
 }
 
 export interface Playlist {

@@ -26,7 +26,7 @@ export function Sidebar() {
 
 function SceneSidebar() {
   const { currentSceneId, setScene } = useSceneStore()
-  const { results } = useSearchStore()
+  const { results, initFiltersForScene } = useSearchStore()
   const { setTab } = useAppStore()
 
   return (
@@ -43,7 +43,7 @@ function SceneSidebar() {
             label={s.name}
             sub={count > 0 ? `${count}曲` : undefined}
             active={currentSceneId === s.id}
-            onClick={() => { setScene(s.id); setTab('scenes') }}
+            onClick={() => { setScene(s.id); setTab('scenes'); initFiltersForScene(s) }}
           />
         )
       })}
