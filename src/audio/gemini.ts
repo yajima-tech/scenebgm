@@ -1,5 +1,5 @@
 const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent'
 
 export interface GeminiSearchResult {
   queries: string[]
@@ -17,50 +17,44 @@ export async function promptToSearchQueries(
 ): Promise<GeminiSearchResult> {
   if (!GEMINI_KEY) throw new Error('Gemini APIキーが未設定です')
 
-  const systemPrompt = `
-あなたはBGM検索の専門家です。ユーザーの日本語のイメージ説明から、
-Freesound.orgで音楽を検索するための英語クエリを3つ生成してください。
-クエリはCC0ライセンスの音楽が見つかりやすい具体的な英語キーワードにしてください。
+  const text = `
+あなたはBGM検索の専門家です。以下の条件でFreesound.orgの検索クエリを3つ生成してください。
+必ずJSON形式のみで返答してください。説明文は不要です。
 
-以下のJSON形式のみで返答してください。説明文は不要です。
+条件:
+- イメージ: ${prompt}
+- ジャンル: ${genre}
+- テンポ: ${tempo}
+- 尺: ${duration}
 
+返答形式:
 {
-  "queries": ["クエリ1", "クエリ2", "クエリ3"],
-  "genre": "判定ジャンル（日本語）",
+  "queries": ["英語クエリ1", "英語クエリ2", "英語クエリ3"],
+  "genre": "ジャンル（日本語）",
   "mood": "ムード（日本語）",
   "bpmRange": [最小BPM, 最大BPM],
-  "description": "このBGMの特徴の説明（日本語・1〜2文）"
+  "description": "このBGMの特徴（日本語・1文）"
 }
-`
-
-  const userMessage = `
-イメージ: ${prompt}
-ジャンル指定: ${genre}
-テンポ指定: ${tempo}
-尺: ${duration}
 `
 
   const res = await fetch(`${GEMINI_URL}?key=${GEMINI_KEY}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      contents: [{
-        parts: [{ text: systemPrompt + userMessage }]
-      }],
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 512,
-      }
+      contents: [{ parts: [{ text }] }],
+      generationConfig: { temperature: 0.7, maxOutputTokens: 512 }
     })
   })
 
-  if (!res.ok) throw new Error(`Gemini API error: ${res.status}`)
+  if (!res.ok) {
+    const errText = await res.text()
+    throw new Error(`Gemini API error: ${res.status} ${errText}`)
+  }
 
   const data = await res.json()
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
-
-  const jsonMatch = text.match(/\{[\s\S]*\}/)
-  if (!jsonMatch) throw new Error('Geminiのレスポンスが不正です')
+  const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
+  const jsonMatch = responseText.match(/\{[\s\S]*\}/)
+  if (!jsonMatch) throw new Error('Geminiのレスポンスが不正です: ' + responseText)
 
   return JSON.parse(jsonMatch[0]) as GeminiSearchResult
 }

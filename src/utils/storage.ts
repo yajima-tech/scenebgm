@@ -1,21 +1,12 @@
 import type { FreesoundTrack } from '../types'
 
-const TAG_KEY   = 'scenebgm-track-tags'
-const TRACK_KEY = 'scenebgm-track-data'
+const TRACK_KEY = 'scenebgm-v2-tracks'
 
 export function saveTracksToStorage(results: FreesoundTrack[]) {
-  const tagData:   Record<string, { scenes: string[]; pinned: boolean; pinnedToPlaylistId: string | null }> = {}
-  const trackData: Record<string, object> = {}
-
+  const data: Record<string, object> = {}
   results.forEach(t => {
     if (t.scenes.size > 0 || t.pinned) {
-      const id = String(t.id)
-      tagData[id] = {
-        scenes: Array.from(t.scenes),
-        pinned: t.pinned,
-        pinnedToPlaylistId: t.pinnedToPlaylistId ?? null,
-      }
-      trackData[id] = {
+      data[String(t.id)] = {
         id: t.id,
         name: t.name,
         bpm: t.bpm,
@@ -29,9 +20,11 @@ export function saveTracksToStorage(results: FreesoundTrack[]) {
       }
     }
   })
-
-  localStorage.setItem(TAG_KEY,   JSON.stringify(tagData))
-  localStorage.setItem(TRACK_KEY, JSON.stringify(trackData))
+  try {
+    localStorage.setItem(TRACK_KEY, JSON.stringify(data))
+  } catch (e) {
+    console.error('localStorage保存エラー:', e)
+  }
 }
 
 export function loadSavedTracks(): FreesoundTrack[] {
@@ -53,14 +46,5 @@ export function loadSavedTracks(): FreesoundTrack[] {
     }))
   } catch {
     return []
-  }
-}
-
-export function loadTagsMap(): Record<string, { scenes: string[]; pinned: boolean }> {
-  try {
-    const raw = localStorage.getItem(TAG_KEY)
-    return raw ? JSON.parse(raw) : {}
-  } catch {
-    return {}
   }
 }

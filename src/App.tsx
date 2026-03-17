@@ -28,7 +28,7 @@ function App() {
         height: '100vh',
         overflow: 'hidden',
         display: 'grid',
-        gridTemplateRows: '60px 1fr auto',
+        gridTemplateRows: '60px 1fr 70px',
         gridTemplateColumns: showSidebar ? '240px 1fr' : '1fr',
         background: '#0d0f14',
         fontFamily: "'Syne', sans-serif",
