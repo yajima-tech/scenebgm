@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import type { FreesoundTrack, Scene } from '../types'
 import { searchBGM } from '../audio/freesound'
-import { saveTracksToStorage, loadSavedTracks } from '../utils/storage'
+import { saveTracks, loadTracks } from '../utils/storage'
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -47,10 +47,10 @@ function debouncedFetch(get: () => SearchState) {
   debounceTimer = setTimeout(() => { get().fetchResults() }, 300)
 }
 
-const restoredTracks = loadSavedTracks()
+const savedTracks = loadTracks()
 
 export const useSearchStore = create<SearchState>((set, get) => ({
-  results: restoredTracks,
+  results: savedTracks,
   loading: false,
   error: null,
 
@@ -97,7 +97,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       freeWord,
     ].filter(Boolean)
 
-    if (!parts.length) { set({ results: loadSavedTracks(), loading: false }); return }
+    if (!parts.length) { set({ results: loadTracks(), loading: false }); return }
 
     set({ loading: true, error: null })
     try {
@@ -112,65 +112,55 @@ export const useSearchStore = create<SearchState>((set, get) => ({
         return true
       })
 
-      const savedTracks = loadSavedTracks()
-      const savedMap = new Map(savedTracks.map(t => [String(t.id), t]))
+      const saved = loadTracks()
+      const savedMap = new Map(saved.map(t => [String(t.id), t]))
       const prevMap = new Map(get().results.map(t => [String(t.id), t]))
 
       const merged: FreesoundTrack[] = filtered.map(r => {
-        const saved = savedMap.get(String(r.id))
-        const prev = prevMap.get(String(r.id))
+        const s = savedMap.get(String(r.id))
+        const p = prevMap.get(String(r.id))
         return {
           ...r,
-          scenes: saved?.scenes ?? prev?.scenes ?? new Set(),
-          pinned: saved?.pinned ?? prev?.pinned ?? false,
-          pinnedToPlaylistId: saved?.pinnedToPlaylistId ?? prev?.pinnedToPlaylistId ?? null,
+          scenes: s?.scenes ?? p?.scenes ?? new Set(),
+          pinned: s?.pinned ?? p?.pinned ?? false,
+          pinnedToPlaylistId: s?.pinnedToPlaylistId ?? p?.pinnedToPlaylistId ?? null,
         }
       })
 
-      // 保存済みトラックで新規取得結果にないものも結果に含める
       const newIds = new Set(merged.map(t => String(t.id)))
-      const savedOnly = savedTracks.filter(t => !newIds.has(String(t.id)))
-
+      const savedOnly = saved.filter(t => !newIds.has(String(t.id)))
       set({ results: [...merged, ...savedOnly], loading: false })
     } catch (e: unknown) {
       set({ error: e instanceof Error ? e.message : String(e), loading: false })
     }
   },
 
-  toggleScene: (trackId, sceneId) => {
-    set(s => {
-      const results = s.results.map(t => {
-        if (t.id !== trackId) return t
-        const next = new Set(t.scenes)
-        next.has(sceneId) ? next.delete(sceneId) : next.add(sceneId)
-        return { ...t, scenes: next }
-      })
-      saveTracksToStorage(results)
-      return { results }
+  toggleScene: (trackId, sceneId) => set(s => {
+    const results = s.results.map(t => {
+      if (t.id !== trackId) return t
+      const next = new Set(t.scenes)
+      next.has(sceneId) ? next.delete(sceneId) : next.add(sceneId)
+      return { ...t, scenes: next }
     })
-  },
+    saveTracks(results)
+    return { results }
+  }),
 
-  togglePin: (trackId, playlistId) => {
-    set(s => {
-      const results = s.results.map(t => {
-        if (t.id !== trackId) return t
-        const pinned = !(t.pinned && t.pinnedToPlaylistId === playlistId)
-        return { ...t, pinned, pinnedToPlaylistId: pinned ? playlistId : null }
-      })
-      saveTracksToStorage(results)
-      return { results }
+  togglePin: (trackId, playlistId) => set(s => {
+    const results = s.results.map(t => {
+      if (t.id !== trackId) return t
+      const pinned = !(t.pinned && t.pinnedToPlaylistId === playlistId)
+      return { ...t, pinned, pinnedToPlaylistId: pinned ? playlistId : null }
     })
-  },
+    saveTracks(results)
+    return { results }
+  }),
 
   initFiltersForScene: (scene) => {
     set({
-      selectedMoods: scene.defaultMoods,
-      selectedInsts: scene.defaultInsts,
-      bpmMin: '',
-      bpmMax: '',
-      durMin: '',
-      durMax: '',
-      freeWord: '',
+      selectedMoods: scene.defaultMoods ?? [],
+      selectedInsts: scene.defaultInsts ?? [],
+      bpmMin: '', bpmMax: '', durMin: '', durMax: '', freeWord: '',
     })
     get().fetchResults()
   },
