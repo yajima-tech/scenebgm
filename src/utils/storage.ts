@@ -24,7 +24,8 @@ export function loadTracks(): FreesoundTrack[] {
   try {
     const raw = localStorage.getItem(KEY)
     if (!raw) return []
-    return Object.values(JSON.parse(raw)).map((t: Record<string, unknown>) => ({
+    const parsed = JSON.parse(raw) as Record<string, Record<string, unknown>>
+    return Object.values(parsed).map((t) => ({
       id: t.id as number, name: t.name as string, bpm: (t.bpm as number | null) ?? null,
       duration: (t.duration as number) ?? 0, tags: (t.tags as string[]) ?? [],
       previews: { 'preview-hq-mp3': (t.previewUrl as string) ?? '' },
