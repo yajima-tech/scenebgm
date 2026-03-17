@@ -74,8 +74,8 @@ function SEListRow({ item, isLive }: { item: SEItem; isLive?: boolean }) {
 
       {/* Duration */}
       <span
-        className="text-xs shrink-0"
-        style={{ color: 'var(--muted2)', fontFamily: "'DM Mono', monospace" }}
+        className={`text-xs shrink-0${item.dur === 'Loop' ? ' se-loop-badge' : ''}`}
+        style={{ color: item.dur === 'Loop' ? 'var(--accent3)' : 'var(--muted2)', fontFamily: "'DM Mono', monospace" }}
       >
         {item.dur}
       </span>

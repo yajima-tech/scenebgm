@@ -56,8 +56,9 @@ export function AiGenPanel() {
 
       {/* 入力エリア */}
       <div className="aigen-input-area">
-        <div className="input-label" style={{ fontSize: 13, fontWeight: 600, color: '#e8e6df' }}>どんなBGMを作りますか？</div>
+        <label htmlFor="aigen-prompt" className="input-label" style={{ fontSize: 13, fontWeight: 600, color: '#e8e6df' }}>どんなBGMを作りますか？</label>
         <textarea
+          id="aigen-prompt"
           className="prompt-input"
           placeholder="例：落ち着いたジャズピアノ、秋の夕暮れのような雰囲気で、登壇シーンに合う格調ある感じ"
           value={prompt}
@@ -75,26 +76,26 @@ export function AiGenPanel() {
         {/* パラメータ */}
         <div className="params-row">
           <div className="param-group">
-            <div className="param-label">ジャンル</div>
-            <select className="param-select" value={genre} onChange={e => setGenre(e.target.value)}>
+            <label htmlFor="aigen-genre" className="param-label">ジャンル</label>
+            <select id="aigen-genre" className="param-select" value={genre} onChange={e => setGenre(e.target.value)}>
               {GENRE_OPTIONS.map(o => <option key={o}>{o}</option>)}
             </select>
           </div>
           <div className="param-group">
-            <div className="param-label">テンポ</div>
-            <select className="param-select" value={tempo} onChange={e => setTempo(e.target.value)}>
+            <label htmlFor="aigen-tempo" className="param-label">テンポ</label>
+            <select id="aigen-tempo" className="param-select" value={tempo} onChange={e => setTempo(e.target.value)}>
               {TEMPO_OPTIONS.map(o => <option key={o}>{o}</option>)}
             </select>
           </div>
           <div className="param-group">
-            <div className="param-label">尺</div>
-            <select className="param-select" value={duration} onChange={e => setDuration(e.target.value)}>
+            <label htmlFor="aigen-dur" className="param-label">尺</label>
+            <select id="aigen-dur" className="param-select" value={duration} onChange={e => setDuration(e.target.value)}>
               {DUR_OPTIONS.map(o => <option key={o}>{o}</option>)}
             </select>
           </div>
           <div className="param-group">
-            <div className="param-label">提案数</div>
-            <select className="param-select" value={varCount} onChange={e => setVarCount(Number(e.target.value))}>
+            <label htmlFor="aigen-var" className="param-label">提案数</label>
+            <select id="aigen-var" className="param-select" value={varCount} onChange={e => setVarCount(Number(e.target.value))}>
               {VAR_OPTIONS.map(o => <option key={o} value={o}>{o}曲</option>)}
             </select>
           </div>

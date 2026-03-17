@@ -617,6 +617,24 @@ html, body, #root {
 .variant-item-name { font-size: 13px; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .variant-item-bpm { font-family: 'DM Mono', monospace; font-size: 11px; color: #9e9d97; flex-shrink: 0; }
 
+/* Volume */
+.vol-wrap { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.vol-slider { width: 64px; cursor: pointer; accent-color: var(--muted2); }
+
+/* SE Loop Badge */
+.se-loop-badge {
+  background: rgba(176,106,232,0.15);
+  border: 1px solid rgba(176,106,232,0.3);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-weight: 600;
+}
+
+/* Slashed zero for CC0 */
+.t-cc0, .gen-tag, .gen-hint, .ai-tag {
+  font-variant-numeric: slashed-zero;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

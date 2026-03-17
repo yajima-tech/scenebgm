@@ -9,7 +9,7 @@ export const SE_CATS: SECategory[] = [
       { id: 's3', emoji: '⏱', name: 'タイムアップ',    sub: 'ピーッとタイマー音',   tags: ['クイズ'],           dur: '1.8s' },
       { id: 's4', emoji: '⏰', name: 'カウントダウン',  sub: '3・2・1 ビープ',       tags: ['クイズ','カウント'], dur: '3.5s' },
       { id: 's5', emoji: '🏆', name: 'グランプリ',      sub: 'ファンファーレ＋歓声', tags: ['クイズ','表彰'],    dur: '4.0s' },
-      { id: 's6', emoji: '🤔', name: 'シンキングタイム',sub: '考え中BGMループ',      tags: ['クイズ','ループ'],  dur: 'Loop' },
+      { id: 's6', emoji: '🤔', name: 'シンキングタイム',sub: '考え中BGM ループ',      tags: ['クイズ','ループ'],  dur: 'Loop' },
     ],
   },
   {

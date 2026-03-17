@@ -12,6 +12,7 @@ export function PlayerBar() {
     currentTime, duration, seek,
     playbackRate, setPlaybackRate,
     detune, setDetune,
+    volume, setVolume,
   } = useAudioPlayer()
 
   function handleProgressClick(e: React.MouseEvent<HTMLDivElement>) {
@@ -56,6 +57,15 @@ export function PlayerBar() {
             </div>
           </div>
           <span className="prog-time">{formatTime(duration)}</span>
+        </div>
+        <div className="vol-wrap">
+          <span style={{ color: 'var(--muted2)', fontSize: 14 }}>🔊</span>
+          <input
+            type="range" min="0" max="1" step="0.01"
+            value={volume}
+            onChange={e => setVolume(parseFloat(e.target.value))}
+            className="vol-slider"
+          />
         </div>
       </div>
 

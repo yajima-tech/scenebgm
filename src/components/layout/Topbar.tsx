@@ -52,18 +52,8 @@ export function Topbar() {
         ))}
       </div>
 
-      {/* Right: AI button + avatar */}
+      {/* Right: avatar */}
       <div className="flex items-center gap-3">
-        <button
-          className="px-3 py-1 rounded-md text-xs font-medium border cursor-pointer"
-          style={{
-            borderColor: 'var(--border-hi)',
-            color: 'var(--muted2)',
-            background: 'transparent',
-          }}
-        >
-          ✦ AI生成 (Phase 2)
-        </button>
         <div
           className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
           style={{ background: 'var(--bg3)', color: 'var(--muted2)' }}

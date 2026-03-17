@@ -81,7 +81,13 @@ export const useAiGenStore = create<AiGenStore>((set, get) => ({
         statusMessage: '',
       })
     } catch (e: unknown) {
-      set({ status: 'error', error: e instanceof Error ? e.message : String(e), statusMessage: '' })
+      const raw = e instanceof Error ? e.message : String(e)
+      let msg = 'BGMの検索中にエラーが発生しました。しばらく待ってから再試行してください。'
+      if (raw.includes('APIキーが未設定')) msg = 'Gemini APIキーが設定されていません。管理者に連絡してください。'
+      else if (raw.includes('400')) msg = 'APIリクエストが無効です。APIキーの設定を確認してください。'
+      else if (raw.includes('403')) msg = 'APIキーが無効または権限がありません。設定を確認してください。'
+      else if (raw.includes('429')) msg = 'APIの利用制限に達しました。しばらく待ってから再試行してください。'
+      set({ status: 'error', error: msg, statusMessage: '' })
     }
   },
 }))

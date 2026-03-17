@@ -103,8 +103,8 @@ function SEPad({ item, isLive }: { item: SEItem; isLive?: boolean }) {
       <div className="flex items-start justify-between mb-1">
         <span style={{ fontSize: 22 }}>{item.emoji}</span>
         <span
-          className="text-xs"
-          style={{ color: 'var(--muted2)', fontFamily: "'DM Mono', monospace" }}
+          className={`text-xs${item.dur === 'Loop' ? ' se-loop-badge' : ''}`}
+          style={{ color: item.dur === 'Loop' ? 'var(--accent3)' : 'var(--muted2)', fontFamily: "'DM Mono', monospace" }}
         >
           {item.dur}
         </span>

@@ -12,6 +12,7 @@ interface PlayerState {
   playbackRate: number
   detune: number
 
+  volume: number
   play: (track: FreesoundResult) => void
   pause: () => void
   stop: () => void
@@ -19,6 +20,7 @@ interface PlayerState {
   setPlaybackRate: (rate: number) => void
   setDetune: (cents: number) => void
   seek: (time: number) => void
+  setVolume: (v: number) => void
 }
 
 export const useAudioPlayer = create<PlayerState>((set, get) => ({
@@ -31,6 +33,7 @@ export const useAudioPlayer = create<PlayerState>((set, get) => ({
   loop: false,
   playbackRate: 1.0,
   detune: 0,
+  volume: 0.75,
 
   play: (track) => {
     const { audio: prev, audioCtx: prevCtx } = get()
@@ -49,6 +52,7 @@ export const useAudioPlayer = create<PlayerState>((set, get) => ({
     const source = ctx.createMediaElementSource(audio)
     source.connect(ctx.destination)
 
+    audio.volume = get().volume
     audio.play().catch(console.error)
 
     audio.addEventListener('timeupdate', () => set({ currentTime: audio.currentTime }))
@@ -101,5 +105,11 @@ export const useAudioPlayer = create<PlayerState>((set, get) => ({
     if (!audio) return
     audio.currentTime = Math.max(0, Math.min(time, audio.duration || 0))
     set({ currentTime: audio.currentTime })
+  },
+
+  setVolume: (v) => {
+    set({ volume: v })
+    const { audio } = get()
+    if (audio) audio.volume = v
   },
 }))
